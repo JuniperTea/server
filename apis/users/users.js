@@ -10,6 +10,7 @@ import { authenticate } from "../../utilities/middlewares.js";
 import { ObjectId } from "mongodb";
 
 const usersRouter = Router();
+console.log("inside userrouter");
 
 usersRouter.get(
   "/",
@@ -18,7 +19,7 @@ usersRouter.get(
   async (req, res) => {
     let username = req.headers.username;
     let password = req.headers.password;
-
+    console.log("inside get");
     getFilteredDocuments("users", { username, password }).then(users => {
       console.log("tests", { username, password, users });
       if (users.length > 0) {
@@ -26,7 +27,6 @@ usersRouter.get(
           {
             username,
             _id: users[0]._id,
-            avatar: users[0].avatar,
           },
           process.env.SECRET_KEY,
           { expiresIn: process.env.TOKEN_EXPIRES }
@@ -44,16 +44,15 @@ usersRouter.get(
         });
       }
     });
-    // let users = await
   }
 );
 
 //On the landing screen, this is the signup component api
 // usersRouter.post("/signup", (req, res) => {  //old code - to be removed when working
 usersRouter.post("/", (req, res) => {
-  let { username, password, avatar } = req.body;
+  let { username, password } = req.body;
 
-  insertDocument("users", { username, password, avatar }).then(x => {
+  insertDocument("users", { username, password }).then(x => {
     res.send({
       success: true,
     });
@@ -76,14 +75,12 @@ usersRouter.get("/profile", authenticate, async (req, res) => {
 
 usersRouter.patch("/profile", authenticate, async (req, res) => {
   let userId = req.headers.authorId;
-  let { username, password, avatar } = req.body;
-  updateDocumentWithId("users", userId, { username, password, avatar }).then(
-    x => {
-      return res.json({
-        success: x.acknowledged,
-      });
-    }
-  );
+  let { username, password } = req.body;
+  updateDocumentWithId("users", userId, { username, password }).then(x => {
+    return res.json({
+      success: x.acknowledged,
+    });
+  });
 });
 
 export default usersRouter;

@@ -5,7 +5,6 @@ import {
   insertDocument,
   updateDocumentWithId,
 } from "../../utilities/db-utils.js";
-import { header } from "express-validator";
 import { authenticate } from "../../utilities/middlewares.js";
 import { ObjectId } from "mongodb";
 

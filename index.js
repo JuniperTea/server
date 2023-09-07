@@ -13,7 +13,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use("/landing", usersRouter); //ladning = source page
+app.use("/login", usersRouter); //ladning = source page
 // app.use("/notes", authenticate, notesRouter);
 //app.use("/add-books", authenticate, booksRouter);
 app.use("/books", authenticate, booksRouter);
@@ -22,3 +22,7 @@ app.use("/books", authenticate, booksRouter);
 // app.use("/likes", authenticate, likesRouter);
 app.use("/friends", authenticate, friendRouter);
 app.use("/profile", authenticate, usersRouter);
+
+app.listen(process.env.PORT, () => {
+  console.log("Server started...");
+});

@@ -11,21 +11,20 @@ import { ObjectId } from "mongodb";
 const booksRouter = Router();
 
 booksRouter.post("/", (req, res) => {
-  // let authorId = req.headers.authorId
-  let { content } = req.body; // { content:"Heyy", authorId:"12jkjdksl3kedjkljsfk" }
   let post = {
-    author: req.body.author,
-    coverArt: req.body.coverArt,
+    title: req.body.title,
     description: req.body.description,
-    format: req.body.format,
-    genre: req.body.genre,
-    isbn: req.body.isbn,
-    pages: req.body.pages,
+    authors: req.body.authors,
+    categories: req.body.categories,
+    language: req.body.language,
+    pageCount: req.body.pageCount,
+    printType: req.body.printType,
     publisher: req.body.publisher,
     publishedDate: req.body.publishedDate,
-    title: req.body.title,
-    series: req.body.series,
-    bookNumber: req.body.bookNumber,
+    maturityRating: req.body.maturityRating,
+    smallThumbnail: req.body.smallThumbnail,
+    id: req.body.id,
+    isbn: req.body.industryIdentifiers[0].identifier,
   };
   insertDocument("library", post)
     .then(x => {
@@ -75,15 +74,6 @@ booksRouter.get("/:bookID", (req, res) => {
     {
       $match: { _id: new ObjectId(bookId) },
     },
-    // {
-    //   $lookup: {
-    //     from: "library",
-    //     localField: "_id",
-    //   },
-    // },
-    // {
-    //   $project: { authorsThatMatched: false, "author.password": false },
-    // },
   ]).then(data => {
     res.json(data);
   });
