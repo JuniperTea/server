@@ -5,6 +5,7 @@ import {
   insertDocument,
   aggregateDocuments,
   getPagedDocuments,
+  updateDocumentWithId,
 } from "../../utilities/db-utils.js";
 import { ObjectId } from "mongodb";
 
@@ -36,9 +37,7 @@ booksRouter.post("/", (req, res) => {
 });
 
 booksRouter.get("/", (req, res) => {
-  console.log("we are in the booksrouter get api");
   let page = req.query.page;
-  console.log("booksrouter get" + page);
   if (page) {
     let itemsPerPage = req.query.itemsPerPage ?? 10;
     getPagedDocuments("library", page, itemsPerPage).then(x => {
@@ -69,7 +68,6 @@ booksRouter.get("/", (req, res) => {
 
 booksRouter.get("/:bookID", (req, res) => {
   let bookId = req.params.bookID;
-  console.log("inside bookrouter getid");
   aggregateDocuments("library", [
     {
       $match: { _id: new ObjectId(bookId) },

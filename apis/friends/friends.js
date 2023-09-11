@@ -10,7 +10,7 @@ import { ObjectId } from "mongodb";
 
 const friendRouter = Router();
 
-friendRouter.get("/friends", authenticate, async (req, res) => {
+friendRouter.get("/friends", async (req, res) => {
   let userId = req.headers.authorId;
   let items = await getFilteredDocuments("users", {
     _id: new ObjectId(userId),
@@ -24,7 +24,7 @@ friendRouter.get("/friends", authenticate, async (req, res) => {
   }
 });
 
-friendRouter.patch("/friends", authenticate, async (req, res) => {
+friendRouter.patch("/friends", async (req, res) => {
   let userId = req.headers.authorId;
   let { friends } = req.body;
   updateDocumentWithId("users", userId, { friends }).then(x => {
