@@ -14,7 +14,7 @@ const reviewsRouter = Router();
 //post a review for a book
 reviewsRouter.post("/", (req, res) => {
   let post = {
-    userId: req.headers.authorId,
+    userId: req.headers.userID,
     bookID: req.body.id,
   };
   insertDocument("reviews", post)
@@ -28,7 +28,7 @@ reviewsRouter.post("/", (req, res) => {
 
 //get all the reviews for a book  WIP
 reviewsRouter.get("/:bookID", async (req, res) => {
-  let userId = req.headers.authorId;
+  let userId = req.headers.userID;
   let items = await getFilteredDocuments("reviews", {
     _id: new ObjectId(userId),
   });

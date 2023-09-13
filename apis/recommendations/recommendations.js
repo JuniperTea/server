@@ -13,7 +13,7 @@ const recommendationsRouter = Router();
 
 recommendationsRouter.post("/", (req, res) => {
   let post = {
-    userId: req.headers.authorId,
+    userId: req.headers.userID,
     bookID: req.body.id,
   };
   insertDocument("recommendations", post)
@@ -27,7 +27,7 @@ recommendationsRouter.post("/", (req, res) => {
 
 //get all the reccomendations for a book made by friends WIP
 recommendationsRouter.get("/", async (req, res) => {
-  let userId = req.headers.authorId;
+  let userId = req.headers.userID;
   let items = await getFilteredDocuments("recommendations", {
     _id: new ObjectId(userId),
   });
@@ -39,7 +39,7 @@ recommendationsRouter.get("/", async (req, res) => {
     });
   }
 });
-// let userId = req.headers.authorId;
+// let userId = req.headers.userID;
 // aggregateDocuments("recommendations", [
 //   {
 //     $match: { _id: new ObjectId(userId) },

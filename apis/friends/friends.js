@@ -1,19 +1,17 @@
 import { Router } from "express";
-import jwt from "jsonwebtoken";
 import {
   getFilteredDocuments,
   insertDocument,
   updateDocumentWithId,
 } from "../../utilities/db-utils.js";
-import { authenticate } from "../../utilities/middlewares.js";
 import { ObjectId } from "mongodb";
 
 const friendRouter = Router();
 
-friendRouter.get("/friends", async (req, res) => {
-  let userId = req.headers.authorId;
-  let items = await getFilteredDocuments("users", {
-    _id: new ObjectId(userId),
+friendRouter.get("/", async (req, res) => {
+  let userId = req.headers.userID;
+  let items = await getFilteredDocuments("friends", {
+    userId: new ObjectId(userId),
   });
   if (items.length > 0) {
     return res.json(items[0]);
@@ -24,13 +22,26 @@ friendRouter.get("/friends", async (req, res) => {
   }
 });
 
-friendRouter.patch("/friends", async (req, res) => {
-  let userId = req.headers.authorId;
-  let { friends } = req.body;
-  updateDocumentWithId("users", userId, { friends }).then(x => {
-    return res.json({
-      success: x.acknowledged,
+friendRouter.post("/", (req, res) => {
+  let userId = req.headers.userID;
+  let post = {
+    userId: userId,
+    friendID: req.body.friendID,
+    friendName: req.body.friendName,
+  };
+  insertDocument("friends", post)
+    .then(x => {
+      res.json({ status: true, message: "Friend Created" });
+    })
+    .catch(err => {
+      res.json({ status: false, message: err });
     });
+});
+
+friendRouter.delete("/:id", (req, res) => {
+  let id = req.params.id;
+  deleteDocument("friends", id).then(x => {
+    res.send(x);
   });
 });
 
