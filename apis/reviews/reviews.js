@@ -15,7 +15,9 @@ const reviewsRouter = Router();
 reviewsRouter.post("/", (req, res) => {
   let post = {
     userId: req.headers.userID,
-    bookID: req.body.id,
+    bookID: req.body.bookID,
+    review: req.body.review,
+    dateOfReview: new Date().toLocaleString() + "",
   };
   insertDocument("reviews", post)
     .then(x => {

@@ -12,18 +12,29 @@ import { ObjectId } from "mongodb";
 const currentRouter = Router();
 
 // This section will help you update a record by id.
-currentRouter.patch("/:id", async (req, res) => {
-  const query = { _id: new ObjectId(req.params.id) };
-  const updates = `{
-      currentlyReading: req.body.currentlyReading,
-    }`;
+currentRouter.patch("/:bookID", async (req, res) => {
+  const _id = req.params.bookID;
+  let currentlyReading = req.body.currentlyReading;
+  const updates = {
+    currentlyReading,
+  };
 
-  updateDocumentWithId("library", _id, updates);
-
-  // let collection = await db.collection("records");
-  // let result = await collection.updateOne(query, updates);
+  let result = await updateDocumentWithId("library", _id, updates);
 
   res.send(result).status(200);
 });
 
+currentRouter.get("/", async (req, res) => {
+  let userId = req.headers.userID;
+  let currentlyReading = true;
+  await getFilteredDocuments("library", { userId, currentlyReading })
+    .then(reading => {
+      if (reading.length > 0) {
+        res.json(reading);
+      }
+    })
+    .catch(err => {
+      console.log(e);
+    });
+});
 export default currentRouter;

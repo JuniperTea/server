@@ -17,9 +17,7 @@ usersRouter.get(
   async (req, res) => {
     let username = req.headers.username;
     let password = req.headers.password;
-    console.log("inside get");
     getFilteredDocuments("users", { username, password }).then(users => {
-      console.log("tests", { username, password, users });
       if (users.length > 0) {
         let token = jwt.sign(
           {
@@ -29,8 +27,6 @@ usersRouter.get(
           process.env.SECRET_KEY,
           { expiresIn: process.env.TOKEN_EXPIRES }
         );
-
-        console.log(token);
         res.json({
           status: true,
           token,

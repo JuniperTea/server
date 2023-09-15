@@ -13,6 +13,7 @@ const booksRouter = Router();
 
 booksRouter.post("/", (req, res) => {
   let post = {
+    userId: req.headers.userID,
     title: req.body.title,
     description: req.body.description,
     authors: req.body.authors,
@@ -26,6 +27,7 @@ booksRouter.post("/", (req, res) => {
     smallThumbnail: req.body.smallThumbnail,
     id: req.body.id,
     isbn: req.body.industryIdentifiers[0].identifier,
+    currentlyReading: req.body.currentlyReading,
   };
   insertDocument("library", post)
     .then(x => {
@@ -37,33 +39,12 @@ booksRouter.post("/", (req, res) => {
 });
 
 booksRouter.get("/", (req, res) => {
-  let page = req.query.page;
-  if (page) {
-    let itemsPerPage = req.query.itemsPerPage ?? 10;
-    getPagedDocuments("library", page, itemsPerPage).then(x => {
-      aggregateDocuments("library", [{ $count: "count" }]).then(c => {
-        let totalItems = c[0].count;
-
-        let totalPages =
-          Math.floor(totalItems / itemsPerPage) < totalItems / itemsPerPage
-            ? Math.floor(totalItems / itemsPerPage) + 1
-            : Math.floor(totalItems / itemsPerPage);
-
-        res.json({
-          page,
-          itemsPerPage,
-          totalPages,
-          totalItems,
-          data: x,
-        });
-      });
-    });
-  } else {
-    // read all docs
-    getAllDocuments("library").then(x => {
-      res.json(x);
-    });
-  }
+  let userId = req.headers.userID;
+  getFilteredDocuments("library", { userId }).then(ui => {
+    if (ui.length > 0) {
+      res.json(ui);
+    }
+  });
 });
 
 booksRouter.get("/:bookID", (req, res) => {
@@ -77,4 +58,22 @@ booksRouter.get("/:bookID", (req, res) => {
   });
 });
 
+booksRouter.patch("/:bookID", async (req, res) => {
+  let userId = req.headers.userID;
+  let currentlyReading = req.body.currentlyReading;
+  let _id = new ObjectId(req.params.bookID);
+  let x = await getFilteredDocuments("books", {
+    _id,
+    userId,
+  });
+  if (x && x.length > 0) {
+    await updateDocumentWithId("books", _id, {
+      currentlyReading: currentlyReading,
+    }).then(
+      res.json({
+        success: true,
+      })
+    );
+  }
+});
 export default booksRouter;
