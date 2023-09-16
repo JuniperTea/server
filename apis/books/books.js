@@ -1,19 +1,16 @@
 import { Router } from "express";
 import {
-  getAllDocuments,
   getFilteredDocuments,
   insertDocument,
-  aggregateDocuments,
-  getPagedDocuments,
-  updateDocumentWithId,
+  deleteDocument,
 } from "../../utilities/db-utils.js";
-import { ObjectId } from "mongodb";
 
 const booksRouter = Router();
 
 booksRouter.post("/", (req, res) => {
   let post = {
     userId: req.headers.userID,
+    googleId: req.body._id,
     title: req.body.title,
     description: req.body.description,
     authors: req.body.authors,
@@ -27,7 +24,6 @@ booksRouter.post("/", (req, res) => {
     smallThumbnail: req.body.smallThumbnail,
     id: req.body.id,
     isbn: req.body.industryIdentifiers[0].identifier,
-    currentlyReading: req.body.currentlyReading,
   };
   insertDocument("library", post)
     .then(x => {
@@ -47,33 +43,12 @@ booksRouter.get("/", (req, res) => {
   });
 });
 
-booksRouter.get("/:bookID", (req, res) => {
-  let bookId = req.params.bookID;
-  aggregateDocuments("library", [
-    {
-      $match: { _id: new ObjectId(bookId) },
-    },
-  ]).then(data => {
-    res.json(data);
+//this deletes the current reading document via the main ID of the record
+booksRouter.delete("/:id", (req, res) => {
+  let id = req.params.id;
+  deleteDocument("library", { id }).then(x => {
+    res.send(x);
   });
 });
 
-booksRouter.patch("/:bookID", async (req, res) => {
-  let userId = req.headers.userID;
-  let currentlyReading = req.body.currentlyReading;
-  let _id = new ObjectId(req.params.bookID);
-  let x = await getFilteredDocuments("books", {
-    _id,
-    userId,
-  });
-  if (x && x.length > 0) {
-    await updateDocumentWithId("books", _id, {
-      currentlyReading: currentlyReading,
-    }).then(
-      res.json({
-        success: true,
-      })
-    );
-  }
-});
 export default booksRouter;

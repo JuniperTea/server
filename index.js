@@ -20,7 +20,6 @@ app.use("/login", usersRouter); //ladning = source page
 app.use("/users", authenticate, usersListRouter);
 app.use("/books", authenticate, booksRouter);
 app.use("/friends", authenticate, friendRouter);
-app.use("/profile", authenticate, usersRouter);
 app.use("/current", authenticate, currentRouter);
 app.use("/recommendations", authenticate, recommendationsRouter);
 app.use("/reviews", authenticate, reviewsRouter);
