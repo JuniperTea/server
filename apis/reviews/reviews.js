@@ -13,6 +13,9 @@ reviewsRouter.post("/", (req, res) => {
     userId: req.headers.userID,
     bookId: req.body._id,
     review: req.body.review,
+    title: req.body.title,
+    smallThumbnail: req.body.smallThumbnail,
+    pageCount: req.body.pageCount,
     dateOfReview: new Date().toLocaleString() + "",
   };
   insertDocument("reviews", post)
@@ -26,31 +29,30 @@ reviewsRouter.post("/", (req, res) => {
 
 //get all the reviews for a book
 reviewsRouter.get("/", async (req, res) => {
-  let userId = req.headers.userID;
-
+  let userId2 = req.headers.userID;
   let r = await aggregateDocuments("library", [
-    { $match: { userId: userId } },
+    { $match: { userId: userId2 } },
+    {
+      $project: {
+        bookId: { $toString: "$_id" },
+      },
+    },
     {
       $lookup: {
         from: "reviews",
-        localField: "_id",
-        foreignField: "bookID",
+        localField: "bookId",
+        foreignField: "bookId",
         as: "revs",
       },
     },
-    {
-      $addFields: {
-        review: "$revs.review",
-        dateofReview: "$revs.dateofReview",
-      },
-    },
-    // {
-    //   $project: {
-    //     revs: 0,
-    //   },
-    // },
+    { $unwind: "$revs" },
+    { $replaceRoot: { newRoot: "$revs" } },
   ]);
-
-  return res.json(r);
+  if (r.length > 0) {
+    return res.json(r);
+  } else {
+    console.log(e);
+  }
 });
+
 export default reviewsRouter;
